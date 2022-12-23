@@ -1,0 +1,20 @@
+#version of the dockercompose syntax
+version: "3.9"
+
+#dockercompose files compose of 1 or more servicess as part of teh app
+services:
+  #we specify that we want to build the app from root folder ( those the dot as context )
+  app:
+    build:
+      context: .
+      args:
+       - DEV=true
+    #ports mapping  8000 local to 8000 docker
+    ports:
+     - "8000:8000"
+    #mapping of the /app folder to the /app folder in running container ( to avoid building the container)
+    volumes:
+     - ./app/:/app
+    #command to run at start
+    command: >
+     sh -c "python manage.py runserver 0.0.0.0:8000"

@@ -1,0 +1,12 @@
+# generic list of ignores
+
+.git
+.gitignore
+.docker
+app/__pychache__/
+app/*/__pychache__/
+app/*/*/__pychache__/
+app/*/*/*/__pychache__/
+.env/
+.venv/
+venv/
