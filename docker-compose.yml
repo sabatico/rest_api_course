@@ -12,9 +12,46 @@ services:
     #ports mapping  8000 local to 8000 docker
     ports:
      - "8000:8000"
+   
     #mapping of the /app folder to the /app folder in running container ( to avoid building the container)
     volumes:
      - ./app/:/app
+    
     #command to run at start
     command: >
      sh -c "python manage.py runserver 0.0.0.0:8000"
+   
+    #add environment vars for app (MUST be same as in DB)
+    environment:
+     - DB_host=db
+     - DB_NAME=devdb
+     - DB_USER=devuser
+     - DB_PASS=changeme
+
+    #add dependency, tell to start only after DB was started
+    depends_on:
+     - db
+
+
+
+  #define a DB connection, 13-alpine  >>> is the docker hub available image, alpine - means light version
+  db:
+    image: postgres:13-alpine
+
+    #link postgres volume to docker locations
+    volumes: 
+     - dev-db-data:/var/lib/postgresql/data
+
+    #add environment variables
+    environment:
+     - PSTGRES_DB=devdb
+     - POSTGRES_USER=devuser
+     - POSTGRES_PASSWORD=changeme
+
+
+
+
+
+#define persistant dat avolumes for docker composer
+volumes:
+  dev-db-data:
