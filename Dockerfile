@@ -25,25 +25,26 @@ EXPOSE 8000
 #this ARG gets overridden when we have DEV arg in docker-compose file
 ARG DEV=false
 
-# generare venv, upgrade pip, install requirements
-#use DEV requirements if the argument is DEV==true ( from docker-compose.yml)
-#create user without home dir, we dont use password
+# generare venv
 RUN python -m venv /py && \
-    /py/bin/pip install --upgrade pip && \
-    #add dependencies for postgresql
-    apk add --update --no-cache postgreswl-client && \
-    apk add --update --no-cache --virtual .tmp-build-deps \
-        build-base postgresql-dev musl-dev && \
-    
-    /py/bin/pip install -r /tmp/requirements.txt && \
+    /py/bin/pip install --upgrade pip
+
+#add dependencies for postgresql
+RUN apk add --update --no-cache postgresql-client && \
+    apk add --update --no-cache --virtual .tmp-build-deps build-base postgresql-dev musl-dev
+
+# install requirements
+RUN /py/bin/pip install -r /tmp/requirements.txt && \
     if [ $DEV="true" ]; \
         then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
-    fi && \
-    rm -rf /tmp && \
-    #remove dependencies for postgresql
-    apk del /tmp-build-deps && \
+    fi
 
-    adduser \
+RUN rm -rf /tmp
+
+#remove dependencies for postgresql
+RUN apk del .tmp-build-deps
+
+RUN adduser \
         --disabled-password \
         --no-create-home \
         django-user
